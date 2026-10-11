@@ -13,6 +13,9 @@ export type HostedReviewExecutionOptions = {
    *  is one of these is Orca's own artifact, not work the user can commit, so it
    *  must not read as "dirty" and block review creation. */
   sharedLinkPaths?: readonly string[]
+  /** The registered repo path branch-review lookups are cached under; creation
+   *  runs from a worktree path, which keys a different cache scope. */
+  reviewLookupRepoPath?: string
 }
 
 export function getHostedReviewLocalGitOptions(

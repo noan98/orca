@@ -5,6 +5,8 @@ import {
   resolveSupportedHostedReviewCopyProvider
 } from '@/i18n/hosted-review-localized-copy'
 import { translate } from '@/i18n/i18n'
+import { useAppStore } from '@/store'
+import { findWorktreeById } from '@/store/github/worktree-refresh'
 import { resolveCreatedHostedReviewLink } from '../../source-control-created-review-link'
 import type { SourceControlStoreActions } from '../listing/use-store-actions'
 import type { SourceControlWorktreeContext } from '../listing/use-worktree-context'
@@ -87,6 +89,7 @@ export function useSourceControlHostedReviewCreated({
           await fetchHostedReviewForBranch(repoPath, branch, {
             force: true,
             repoId,
+            admissionTier: 'interactive',
             ...linkedReviewNumbers
           })
           return
@@ -95,14 +98,21 @@ export function useSourceControlHostedReviewCreated({
           await fetchHostedReviewForBranch(repoPath, branch, {
             force: true,
             repoId,
+            admissionTier: 'interactive',
             ...linkedReviewNumbers
           })
           return
         }
+        // Why: the same head as fetchPRForBranch lets main coalesce both into one GitHub lookup.
+        const currentHeadOid = worktreeId
+          ? (findWorktreeById(useAppStore.getState(), worktreeId)?.head ?? null)
+          : null
         await Promise.all([
           fetchHostedReviewForBranch(repoPath, branch, {
             force: true,
             repoId,
+            admissionTier: 'interactive',
+            currentHeadOid,
             ...linkedReviewNumbers
           }),
           fetchPRForBranch(repoPath, branch, {

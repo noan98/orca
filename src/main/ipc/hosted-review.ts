@@ -172,7 +172,8 @@ export function registerHostedReviewHandlers(store: Store, stats: StatsCollector
             ...(Object.keys(localGitOptions).length > 0
               ? { localGitExecOptions: localGitOptions }
               : {}),
-            ...(sharedLinkPaths.length > 0 ? { sharedLinkPaths } : {})
+            ...(sharedLinkPaths.length > 0 ? { sharedLinkPaths } : {}),
+            reviewLookupRepoPath: repo.path
           }
         : undefined
     const input = {
@@ -213,7 +214,8 @@ export function registerHostedReviewHandlers(store: Store, stats: StatsCollector
         ...(Object.keys(localGitOptions).length > 0
           ? { localGitExecOptions: localGitOptions }
           : {}),
-        ...(sharedLinkPaths.length > 0 ? { sharedLinkPaths } : {})
+        ...(sharedLinkPaths.length > 0 ? { sharedLinkPaths } : {}),
+        reviewLookupRepoPath: repo.path
       }
       const input = {
         provider: args.provider,

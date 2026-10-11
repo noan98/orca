@@ -285,6 +285,9 @@ export async function createHostedReview(
     // Why (#11532): the branch cache holds a "no review" answer for far longer
     // than a poll interval, so Orca's own creation must retire it at once.
     invalidateHostedReviewBranchCache(repoPath, executionHostId)
+    if (options.reviewLookupRepoPath && options.reviewLookupRepoPath !== repoPath) {
+      invalidateHostedReviewBranchCache(options.reviewLookupRepoPath, executionHostId)
+    }
   }
   return result
 }

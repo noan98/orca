@@ -47,7 +47,8 @@ export function hostedReviewOptionArgs(
 export function admissionTierForRefreshReason(
   reason: GitHubPRRefreshReason
 ): 'interactive' | 'background' {
-  return reason === 'manual' ? 'interactive' : 'background'
+  // Why: post-push follows the user's own push or Create PR on one worktree, so it must not queue behind polling.
+  return reason === 'manual' || reason === 'post-push' ? 'interactive' : 'background'
 }
 
 export function refreshKey(candidate: GitHubPRRefreshCandidate): string {
