@@ -175,10 +175,12 @@ export class RuntimeHostedReviewCommands {
       draft: args.draft,
       ...(args.useTemplate !== undefined ? { useTemplate: args.useTemplate } : {})
     }
-    const executionHostId = getRepoHostedReviewExecutionHostId(repo)
-    const result = executionOptions
-      ? await createHostedReview(repoPath, input, executionHostId, executionOptions)
-      : await createHostedReview(repoPath, input, executionHostId)
+    const result = await createHostedReview(
+      repoPath,
+      input,
+      getRepoHostedReviewExecutionHostId(repo),
+      { ...executionOptions, reviewLookupRepoPath: repo.path }
+    )
     if (result.ok) {
       this.deps.recordCreated(repo.id, result.number, result.url)
     }
@@ -202,7 +204,7 @@ export class RuntimeHostedReviewCommands {
         ...(args.useTemplate !== undefined ? { useTemplate: args.useTemplate } : {})
       },
       getRepoHostedReviewExecutionHostId(repo),
-      executionOptions ?? {}
+      { ...executionOptions, reviewLookupRepoPath: repo.path }
     )
     if (result.ok) {
       this.deps.recordCreated(repo.id, result.number, result.url)

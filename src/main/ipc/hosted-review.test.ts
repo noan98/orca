@@ -171,7 +171,10 @@ describe('registerHostedReviewHandlers', () => {
         title: 'Feature PR'
       }),
       'local',
-      { localGitExecOptions: { wslDistro: 'Ubuntu', admissionTier: 'interactive' } }
+      {
+        localGitExecOptions: { wslDistro: 'Ubuntu', admissionTier: 'interactive' },
+        reviewLookupRepoPath: localRepo.path
+      }
     )
   })
 
@@ -214,7 +217,8 @@ describe('registerHostedReviewHandlers', () => {
       'local',
       {
         localGitExecOptions: { admissionTier: 'interactive' },
-        sharedLinkPaths: ['node_modules']
+        sharedLinkPaths: ['node_modules'],
+        reviewLookupRepoPath: localRepo.path
       }
     )
   })
@@ -244,7 +248,8 @@ describe('registerHostedReviewHandlers', () => {
       expect.anything(),
       'ssh:ssh-1',
       {
-        localGitExecOptions: { admissionTier: 'interactive' }
+        localGitExecOptions: { admissionTier: 'interactive' },
+        reviewLookupRepoPath: repoPath
       }
     )
   })
@@ -442,7 +447,7 @@ describe('registerHostedReviewHandlers', () => {
         draft: false
       },
       'ssh:ssh-1',
-      { localGitExecOptions: { admissionTier: 'interactive' } }
+      { localGitExecOptions: { admissionTier: 'interactive' }, reviewLookupRepoPath: repoPath }
     )
     expect(resolveRegisteredWorktreePathMock).not.toHaveBeenCalled()
     expect(stats.record).toHaveBeenCalledWith(
@@ -478,7 +483,7 @@ describe('registerHostedReviewHandlers', () => {
       worktreePath,
       expect.objectContaining({ base: 'stack/parent', head: 'stack/child' }),
       'ssh:ssh-1',
-      { localGitExecOptions: { admissionTier: 'interactive' } }
+      { localGitExecOptions: { admissionTier: 'interactive' }, reviewLookupRepoPath: repoPath }
     )
     expect(createHostedReviewMock).not.toHaveBeenCalled()
   })
@@ -522,17 +527,18 @@ describe('registerHostedReviewHandlers', () => {
       const expected = {
         localGitExecOptions: expect.objectContaining({ ghAccount: boundRepo.ghAccount })
       }
+      const expectedCreate = { ...expected, reviewLookupRepoPath: repoPath }
       expect(createHostedReviewMock).toHaveBeenCalledWith(
         worktreePath,
         expect.anything(),
         'ssh:ssh-1',
-        expected
+        expectedCreate
       )
       expect(createStackedHostedReviewMock).toHaveBeenCalledWith(
         worktreePath,
         expect.anything(),
         'ssh:ssh-1',
-        expected
+        expectedCreate
       )
       expect(getHostedReviewForBranchMock).toHaveBeenCalledWith(expect.objectContaining(expected))
     })

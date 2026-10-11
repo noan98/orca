@@ -116,6 +116,7 @@ vi.mock('./hosted-review', () => ({
 }))
 
 import { createHostedReview } from './hosted-review-creation'
+import { withHostedReviewBranchCache } from './hosted-review-branch-cache'
 
 import { _resetOriginGitHubApiRepositoryCache } from '../github/github-api-repository'
 
@@ -680,5 +681,21 @@ describe('createHostedReview', () => {
       }
     })
     expect(createGitHubPullRequestMock).not.toHaveBeenCalled()
+  })
+
+  it('retires the registered repo\'s cached "no review" when creating from a worktree', async () => {
+    const identity = { repoPath: '/repo', executionHostId: 'local' as const, branch: 'feature' }
+    await withHostedReviewBranchCache(identity, { headOid: null }, async () => null)
+
+    await createHostedReview(
+      '/repo-worktrees/feature',
+      { provider: 'github', base: 'main', head: 'feature', title: 'Feature' },
+      'local',
+      { reviewLookupRepoPath: '/repo' }
+    )
+
+    const lookup = vi.fn(async () => null)
+    await withHostedReviewBranchCache(identity, { headOid: null }, lookup)
+    expect(lookup).toHaveBeenCalledOnce()
   })
 })
